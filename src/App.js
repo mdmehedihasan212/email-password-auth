@@ -12,6 +12,7 @@ function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [validated, setValidated] = useState(false);
+  const [registered, setRegistered] = useState(false);
   const [error, setError] = useState('');
 
 
@@ -36,7 +37,6 @@ function App() {
       setError('Password should contain at lest one special character')
       return;
     }
-
     setValidated(true);
     setError('')
 
@@ -44,9 +44,20 @@ function App() {
       .then(result => {
         const user = result.user;
         console.log(user);
+        setEmail('')
+        setPassword('')
+      })
+      .catch(error => {
+        setError(error.message)
+        console.error(error);
       })
     event.preventDefault();
   }
+
+  const handleToCheck = event => {
+    setRegistered(event.target.checked);
+  }
+
 
   return (
     <div>
@@ -59,7 +70,7 @@ function App() {
       </form> */}
       <div className="registration w-50 mx-auto mt-5">
         <Form noValidate validated={validated} onSubmit={handleToSubmit}>
-          <h1 className='text-primary'>Please Register!!!</h1>
+          <h1 className='text-primary'>Please {registered ? 'Login' : 'Register'}!!!</h1>
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Email address</Form.Label>
             <Form.Control onBlur={handleToEmail} type="email" placeholder="Enter email" required />
@@ -78,6 +89,9 @@ function App() {
               Please choose a Password.
             </Form.Control.Feedback>
           </Form.Group>
+          <Form.Group className="mb-3" controlId="formBasicCheckbox">
+            <Form.Check onChange={handleToCheck} type="checkbox" label="Already Registered" />
+          </Form.Group>
 
           {/* <Form.Group className="mb-3">
             <Form.Check
@@ -89,7 +103,7 @@ function App() {
           </Form.Group> */}
           <p className='text-danger'>{error}</p>
           <Button variant="primary" type="submit">
-            Register
+            {registered ? 'Login' : 'Register'}
           </Button>
         </Form>
       </div>
