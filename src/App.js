@@ -1,5 +1,5 @@
 import './App.css';
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, signInWithEmailAndPassword } from "firebase/auth";
 import app from './firebase.init';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Form from 'react-bootstrap/Form';
@@ -37,25 +37,48 @@ function App() {
       setError('Password should contain at lest one special character')
       return;
     }
-    setValidated(true);
     setError('')
+    setValidated(true);
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(result => {
-        const user = result.user;
-        console.log(user);
-        setEmail('')
-        setPassword('')
-      })
-      .catch(error => {
-        setError(error.message)
-        console.error(error);
-      })
+
+    if (registered) {
+      signInWithEmailAndPassword(auth, email, password)
+        .then(result => {
+          const user = result.user;
+          console.log(user);
+        })
+        .catch(error => {
+          setError(error.message)
+        })
+    }
+    else {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(result => {
+          const user = result.user;
+          console.log(user);
+          setEmail('');
+          setPassword('');
+          verifyEmail();
+        })
+        .catch(error => {
+          setError(error.message)
+          console.error(error);
+        })
+    }
+
+
     event.preventDefault();
   }
 
   const handleToCheck = event => {
     setRegistered(event.target.checked);
+  }
+
+  const verifyEmail = () => {
+    sendEmailVerification(auth.currentUser)
+      .then(() => {
+        console.log('Email verification sent!');
+      });
   }
 
 
